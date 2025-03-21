@@ -60,21 +60,6 @@ A word puzzle game where players need to form valid words from a given base word
 - `npm run preview` - Preview the production build locally
 - `npm run validate` - Run the level validation script to check for invalid or duplicate words
 
-### Project Structure
-
-```
-src/
-├── components/
-│   ├── WordGame/         # Main game components
-│   ├── Admin/           # Admin interface components
-│   └── ValidationModal/ # Level validation modal
-├── data/
-│   └── levels.ts        # Game levels data
-├── utils/
-│   └── wordValidation.ts # Word validation logic
-└── scripts/
-    └── validateLevels.ts # Level validation script
-```
 
 ## Contributing
 
