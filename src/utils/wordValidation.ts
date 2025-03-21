@@ -1,0 +1,80 @@
+import { fetchWordDefinition } from "../components/WordGame/dictionaryService"
+
+export interface ValidationResult {
+  valid: string[]
+  invalid: string[]
+  duplicates: string[]
+  notRealWords: string[]
+  baseWordValid: boolean
+  baseWordTooShort: boolean
+  baseWordNotReal: boolean
+}
+
+export async function validateLevelWords(baseWord: string, subWords: string[]): Promise<ValidationResult> {
+  const valid: string[] = []
+  const invalid: string[] = []
+  const duplicates = new Set<string>()
+  const seen = new Set<string>()
+  const notRealWords: string[] = []
+  
+  // Check if base word is at least 5 letters long and is a valid English word
+  const baseWordTooShort = baseWord.length < 5
+  let baseWordNotReal = false
+  if (!baseWordTooShort) {
+    const baseWordDefinition = await fetchWordDefinition(baseWord)
+    baseWordNotReal = baseWordDefinition === null
+  }
+  const baseWordValid = !baseWordTooShort && !baseWordNotReal
+
+  // Check for duplicates
+  subWords.forEach((word: string) => {
+    const lower = word.toLowerCase()
+    if (seen.has(lower)) {
+      duplicates.add(word)
+    }
+    seen.add(lower)
+  })
+  
+  // Check if each word can be formed from base word
+  subWords.forEach(word => {
+    if (isValidWord(word, baseWord)) {
+      valid.push(word)
+    } else {
+      invalid.push(word)
+    }
+  })
+  
+  // Check all words against the dictionary
+  for (const word of [...valid]) {
+    const definition = await fetchWordDefinition(word)
+    if (!definition) {
+      notRealWords.push(word)
+    }
+  }
+
+  return {
+    valid,
+    invalid,
+    duplicates: Array.from(duplicates),
+    notRealWords,
+    baseWordValid,
+    baseWordTooShort,
+    baseWordNotReal
+  }
+}
+
+export function isValidWord(word: string, baseWord: string): boolean {
+  const baseLetters = baseWord.toLowerCase().split('').reduce((acc, letter) => {
+    acc[letter] = (acc[letter] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  const wordLetters = word.toLowerCase().split('').reduce((acc, letter) => {
+    acc[letter] = (acc[letter] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+
+  return Object.entries(wordLetters).every(([letter, count]) => 
+    (baseLetters[letter] || 0) >= count
+  )
+}
