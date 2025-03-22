@@ -6,13 +6,15 @@ interface ProgressSectionProps {
   guessedWords: string[]
   onShowDefinitions: () => void
   isLevelComplete: boolean
+  revealedLetters: Record<string, Set<number>>
 }
 
 const ProgressSection: React.FC<ProgressSectionProps> = ({
   subWords,
   guessedWords,
   onShowDefinitions,
-  isLevelComplete
+  isLevelComplete,
+  revealedLetters
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -91,7 +93,7 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
                       color: guessedWords.includes(word) ? 'white' : 'text.primary',
                     }}
                   >
-                    {letterIndex === 0 || guessedWords.includes(word) ? letter.toUpperCase() : ''}
+                    {letterIndex === 0 || guessedWords.includes(word) || (revealedLetters[word]?.has(letterIndex)) ? letter.toUpperCase() : ''}
                   </Box>
                 ))}
               </Box>

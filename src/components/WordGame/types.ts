@@ -42,6 +42,7 @@ export interface GameState {
   feedback: FeedbackState;
   letterCounts: Record<string, number>;
   availableLetters: Record<string, number>;
+  revealedLetters: Record<string, Set<number>>;
 }
 
 export interface LetterButtonProps {

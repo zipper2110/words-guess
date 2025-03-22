@@ -35,7 +35,8 @@ export const useGameState = (props: UseGameStateProps) => {
     selectedWord: '',
     feedback: { message: '', type: 'success', open: false },
     letterCounts: {},
-    availableLetters: {}
+    availableLetters: {},
+    revealedLetters: {}
   })
 
   const [isLevelComplete, setIsLevelComplete] = useState(false)
@@ -233,29 +234,52 @@ export const useGameState = (props: UseGameStateProps) => {
     const unguessedWords = gameState.subWords.filter(word => !guessedWords.includes(word))
     if (unguessedWords.length > 0) {
       const clueWord = unguessedWords[0]
-      const newGuessedWords = [...guessedWords, clueWord]
+      const revealedPositions = gameState.revealedLetters[clueWord] || new Set<number>([0])
       
-      // Support both function naming styles
-      if (typeof onGuessedWordsUpdate === 'function') {
-        onGuessedWordsUpdate(newGuessedWords)
-      } else if (typeof setGuessedWords === 'function') {
-        setGuessedWords(newGuessedWords)
+      // Find the next unrevealed position (start from 1 since first letter is always revealed)
+      let nextPosition = 1
+      while (nextPosition < clueWord.length && revealedPositions.has(nextPosition)) {
+        nextPosition++
       }
       
-      setGameState(prev => ({
-        ...prev,
-        feedback: {
-          message: `Clue revealed: ${clueWord}`,
-          type: 'success',
-          open: true
+      if (nextPosition < clueWord.length) {
+        const newRevealedPositions = new Set([...revealedPositions, nextPosition])
+        
+        // Check if all letters are now revealed
+        const allLettersRevealed = nextPosition === clueWord.length - 1
+        
+        setGameState(prev => ({
+          ...prev,
+          revealedLetters: {
+            ...prev.revealedLetters,
+            [clueWord]: newRevealedPositions
+          },
+          feedback: {
+            message: allLettersRevealed 
+              ? `All letters revealed! The word is "${clueWord}"!`
+              : `Clue: The letter '${clueWord[nextPosition]}' appears in position ${nextPosition + 1} of one of the remaining words`,
+            type: 'success',
+            open: true
+          }
+        }))
+
+        // If all letters are revealed, add the word to guessed words
+        if (allLettersRevealed) {
+          const newGuessedWords = [...guessedWords, clueWord]
+          if (typeof onGuessedWordsUpdate === 'function') {
+            onGuessedWordsUpdate(newGuessedWords)
+          } else if (typeof setGuessedWords === 'function') {
+            setGuessedWords(newGuessedWords)
+          }
+          
+          // Check if level is complete
+          const foundAllSubWords = gameState.subWords.every(word => 
+            newGuessedWords.includes(word)
+          )
+          if (foundAllSubWords) {
+            setIsLevelComplete(true)
+          }
         }
-      }))
-      
-      const foundAllSubWords = gameState.subWords.every(word => 
-        newGuessedWords.includes(word)
-      )
-      if (foundAllSubWords) {
-        setIsLevelComplete(true)
       }
     }
   }
