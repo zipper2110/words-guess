@@ -16,6 +16,12 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   
+  // Count only the guessed words that are in the subWords list
+  const validGuessedWordsCount = guessedWords.filter(word => subWords.includes(word)).length;
+  
+  // Filter guessed words to get only those not in the subWords list
+  const customFoundWords = guessedWords.filter(word => !subWords.includes(word));
+
   return (
     <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
       {/* Progress section */}
@@ -29,13 +35,13 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
           Progress: 
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {guessedWords.length} / {subWords.length}
+          {validGuessedWordsCount} / {subWords.length}
         </Typography>
       </Box>
       
       <LinearProgress 
         variant="determinate" 
-        value={guessedWords.length > 0 ? Math.round((guessedWords.length / subWords.length) * 100) : 0} 
+        value={validGuessedWordsCount > 0 ? Math.min(100, Math.round((validGuessedWordsCount / subWords.length) * 100)) : 0} 
         sx={{ 
           height: 6,
           borderRadius: 3,
@@ -104,15 +110,15 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
             fontSize: '1.1rem'
           }}
         >
-          Found Words:
+          Bonus Words:
         </Typography>
-        {guessedWords.length > 0 ? (
+        {customFoundWords.length > 0 ? (
           <Box sx={{ 
             display: 'flex', 
             flexWrap: 'wrap', 
             gap: 0.5 
           }}>
-            {guessedWords.map((word, index) => (
+            {customFoundWords.map((word, index) => (
               <Chip
                 key={index}
                 label={word.toUpperCase()}
@@ -133,7 +139,7 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" fontSize="0.75rem">
-            No words found yet
+            No bonus words found yet
           </Typography>
         )}
       </Box>
