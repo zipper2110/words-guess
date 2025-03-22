@@ -2,6 +2,7 @@ import { Box, TextField, IconButton, Button } from '@mui/material'
 import BackspaceIcon from '@mui/icons-material/Backspace'
 import ClearIcon from '@mui/icons-material/Clear'
 import LetterButton from '../LetterButton'
+import { useTranslation } from 'react-i18next'
 
 interface InputSectionProps {
   userInput: string
@@ -24,13 +25,15 @@ const InputSection: React.FC<InputSectionProps> = ({
   onBackspace,
   onClear
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
       {/* Word Input Field */}
       <TextField
         fullWidth
         value={userInput}
-        placeholder={isLevelComplete ? "Level Complete!" : "Type your guess..."}
+        placeholder={isLevelComplete ? t('levelCompletePlaceholder') : t('typeGuess')}
         sx={{
           mb: 2,
           '& .MuiOutlinedInput-root': {
@@ -104,7 +107,7 @@ const InputSection: React.FC<InputSectionProps> = ({
           textTransform: 'none'
         }}
       >
-        Submit
+        {t('submit')}
       </Button>
     </Box>
   )

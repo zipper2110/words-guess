@@ -6,6 +6,7 @@ import { WiDaySunny } from 'react-icons/wi'
 import { WiMoonAltWaningCrescent4 } from 'react-icons/wi'
 import { LEVELS } from '../../../data/levels'
 import { Level } from '../types'
+import { useTranslation } from 'react-i18next'
 
 interface GameHeaderProps {
   level: number | Level
@@ -26,6 +27,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onClue = () => {},
   isDarkMode = false
 }) => {
+  const { t } = useTranslation();
   const levelIndex = typeof level === 'object' ? level.index || 1 : level
 
   return (
@@ -43,7 +45,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           flex: '0 0 auto'
         }}
       >
-        Level {levelIndex}
+        {t('level')} {levelIndex}
       </Typography>
       <Box sx={{ 
         display: 'flex',
@@ -61,7 +63,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             mb: 0.25
           }}
         >
-          Score
+          {t('score')}
         </Typography>
         <Typography 
           variant="h6" 
@@ -74,7 +76,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           {score}
         </Typography>
       </Box>
-      <Box sx={{ display: 'flex', gap: 1, flex: '0 0 auto' }}>
+      <Box sx={{ display: 'flex', gap: 0.5 }}>
         <IconButton
           onClick={onHelpClick}
           color="primary"

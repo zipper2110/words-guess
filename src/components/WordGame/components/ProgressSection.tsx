@@ -1,4 +1,5 @@
 import { Box, Typography, Grid, Chip, Button, LinearProgress, useTheme } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 
 interface ProgressSectionProps {
   subWords: string[]
@@ -13,6 +14,7 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
   onShowDefinitions,
   isLevelComplete
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   
@@ -32,7 +34,7 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
         mb: 1 
       }}>
         <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-          Progress: 
+          {t('progress')}: 
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {validGuessedWordsCount} / {subWords.length}
@@ -55,53 +57,51 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
       />
 
       {/* Word Hints Section */}
-      {subWords.length > 0 && (
-        <Box sx={{ mb: 1.5 }}>
-          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-            Word Hints:
-          </Typography>
-          <Grid container spacing={0.5}>
-            {subWords.map((word, wordIndex) => (
-              <Grid item xs={6} sm={4} key={wordIndex}>
-                <Box sx={{ 
-                  display: 'flex', 
-                  gap: 0.5, 
-                  p: 0.5,
-                  bgcolor: guessedWords.includes(word) ? 'success.light' : 'transparent',
-                  borderRadius: 1,
-                  justifyContent: 'center',
-                  opacity: guessedWords.includes(word) ? 1 : 0.9
-                }}>
-                  {word.split('').map((letter, letterIndex) => (
-                    <Box
-                      key={letterIndex}
-                      sx={{
-                        width: { xs: 24, sm: 28 },
-                        height: { xs: 24, sm: 28 },
-                        border: '1px solid',
-                        borderColor: guessedWords.includes(word) ? 'success.main' : 'primary.light',
-                        borderRadius: 0.5,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: { xs: '0.75rem', sm: '0.9rem' },
-                        fontWeight: 800,
-                        backgroundColor: guessedWords.includes(word) ? 'success.light' : 'background.default',
-                        color: guessedWords.includes(word) ? 'white' : 'text.primary',
-                      }}
-                    >
-                      {letterIndex === 0 || guessedWords.includes(word) ? letter.toUpperCase() : ''}
-                    </Box>
-                  ))}
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
+      <Box sx={{ mb: 1.5 }}>
+        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+          {t('wordHints')}:
+        </Typography>
+        <Grid container spacing={0.5}>
+          {subWords.map((word, wordIndex) => (
+            <Grid item xs={6} sm={4} key={wordIndex}>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 0.5, 
+                p: 0.5,
+                bgcolor: guessedWords.includes(word) ? 'success.light' : 'transparent',
+                borderRadius: 1,
+                justifyContent: 'center',
+                opacity: guessedWords.includes(word) ? 1 : 0.9
+              }}>
+                {word.split('').map((letter, letterIndex) => (
+                  <Box
+                    key={letterIndex}
+                    sx={{
+                      width: { xs: 24, sm: 28 },
+                      height: { xs: 24, sm: 28 },
+                      border: '1px solid',
+                      borderColor: guessedWords.includes(word) ? 'success.main' : 'primary.light',
+                      borderRadius: 0.5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: { xs: '0.75rem', sm: '0.9rem' },
+                      fontWeight: 800,
+                      backgroundColor: guessedWords.includes(word) ? 'success.light' : 'background.default',
+                      color: guessedWords.includes(word) ? 'white' : 'text.primary',
+                    }}
+                  >
+                    {letterIndex === 0 || guessedWords.includes(word) ? letter.toUpperCase() : ''}
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
 
       {/* Found Words Section */}
-      <Box sx={{ mb: 1.5 }}>
+      <Box>
         <Typography 
           variant="subtitle1" 
           sx={{ 
@@ -110,7 +110,7 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
             fontSize: '1.1rem'
           }}
         >
-          Bonus Words:
+          {t('bonusWords')}:
         </Typography>
         {customFoundWords.length > 0 ? (
           <Box sx={{ 
@@ -139,7 +139,7 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" fontSize="0.75rem">
-            No bonus words found yet
+            {t('noBonusWords')}
           </Typography>
         )}
       </Box>
@@ -158,7 +158,7 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
             mb: 1
           }}
         >
-          Show Definitions
+          {t('showDefinitions')}
         </Button>
       )}
     </Box>
