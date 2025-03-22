@@ -3,6 +3,7 @@ import { Box, Button, TextField, Grid, Typography, Snackbar, Alert, Paper, IconB
 import HelpIcon from '@mui/icons-material/Help'
 import BackspaceIcon from '@mui/icons-material/Backspace'
 import ClearIcon from '@mui/icons-material/Clear'
+import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import { LEVELS } from '../../data/levels'
 import { WordGameProps, GameState, FeedbackState, WordDefinition } from './types'
 import { LetterButton } from './LetterButton'
@@ -208,14 +209,24 @@ const WordGame: React.FC<WordGameProps> = ({
           <Typography variant="h5" align="center">
             Score: {score}
           </Typography>
-          <IconButton
-            onClick={() => setShowHelp(true)}
-            color="primary"
-            size="large"
-            aria-label="help"
-          >
-            <HelpIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <IconButton
+              onClick={handleClue}
+              sx={{ color: '#DAA520' }}
+              size="large"
+              aria-label="clue"
+            >
+              <LightbulbIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => setShowHelp(true)}
+              color="primary"
+              size="large"
+              aria-label="help"
+            >
+              <HelpIcon />
+            </IconButton>
+          </Box>
         </Grid>
 
         {isLevelComplete && (
@@ -318,15 +329,6 @@ const WordGame: React.FC<WordGameProps> = ({
               Show Definitions
             </Button>
           )}
-          <Button
-            variant="outlined"
-            color="info"
-            onClick={handleClue}
-            disabled={isLevelComplete || subWords.every(word => guessedWords.includes(word))}
-            size="small"
-          >
-            Clue
-          </Button>
         </Grid>
       </Grid>
 
