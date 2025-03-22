@@ -63,8 +63,8 @@ function App() {
       <Router>
         <Container maxWidth="md">
           <Box sx={{ my: 4, textAlign: 'center' }}>
-            <Typography variant="h3" component="h1" gutterBottom>
-              Word Game
+            <Typography variant="h6" component="h1" gutterBottom>
+              Level {currentLevel} of {LEVELS.length}
             </Typography>
             <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
               <Button
@@ -98,9 +98,6 @@ function App() {
               path="/" 
               element={
                 <>
-                  <Typography variant="subtitle1" gutterBottom align="center" sx={{ mb: 2 }}>
-                    Level {currentLevel} of {LEVELS.length}
-                  </Typography>
                   <WordGame
                     level={currentLevel}
                     onLevelComplete={handleLevelComplete}

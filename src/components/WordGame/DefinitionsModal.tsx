@@ -26,7 +26,7 @@ interface DefinitionsModalProps {
   isLoadingDefinitions: boolean;
 }
 
-export const DefinitionsModal: React.FC<DefinitionsModalProps> = ({
+const DefinitionsModal: React.FC<DefinitionsModalProps> = ({
   open,
   onClose,
   guessedWords,
@@ -87,4 +87,6 @@ export const DefinitionsModal: React.FC<DefinitionsModalProps> = ({
       </Box>
     </Modal>
   )
-} 
+}
+
+export default DefinitionsModal 

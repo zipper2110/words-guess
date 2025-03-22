@@ -1,11 +1,19 @@
+export interface Level {
+  baseWord: string;
+  subWords: string[];
+  index?: number;
+}
+
 export interface WordGameProps {
-  level: number
-  onLevelComplete: () => void
-  score: number
-  onScoreUpdate: (points: number) => void
-  guessedWords: string[]
-  onGuessedWordsUpdate: (words: string[]) => void
-  subWords: string[]
+  level: Level | number;
+  onLevelComplete: () => void;
+  score: number;
+  onScoreUpdate: (newScore: number) => void;
+  guessedWords: string[];
+  onGuessedWordsUpdate?: (words: string[]) => void;
+  setGuessedWords?: (words: string[]) => void;
+  subWords?: string[];
+  onResetGame?: () => void;
 }
 
 export interface WordDefinition {
@@ -28,4 +36,35 @@ export interface GameState {
   definitions: WordDefinition[];
   selectedWord: string;
   feedback: FeedbackState;
+}
+
+export interface LetterButtonProps {
+  letter: string;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+export interface GameBoardProps {
+  words?: string[];
+  totalWords?: number;
+  onShowDefinitions?: () => void;
+  // Legacy props support
+  subWords?: string[];
+  guessedWords?: string[];
+}
+
+export interface DefinitionsModalProps {
+  open: boolean;
+  onClose: () => void;
+  guessedWords?: string[];
+  words?: string[];
+  selectedWord?: string;
+  onWordSelect?: (word: string) => void;
+  definitions?: WordDefinition[];
+  isLoadingDefinitions?: boolean;
+}
+
+export interface HelpModalProps {
+  open: boolean;
+  onClose: () => void;
 } 

@@ -1,30 +1,33 @@
 import { useState, useEffect } from 'react'
-import { Box, Button, TextField, Grid, Typography, Snackbar, Alert, Paper, IconButton } from '@mui/material'
+import { Box, Button, TextField, Grid, Typography, Snackbar, Alert, Paper, IconButton, Container, LinearProgress, Chip } from '@mui/material'
 import HelpIcon from '@mui/icons-material/Help'
 import BackspaceIcon from '@mui/icons-material/Backspace'
 import ClearIcon from '@mui/icons-material/Clear'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import { LEVELS } from '../../data/levels'
 import { WordGameProps, GameState, FeedbackState, WordDefinition } from './types'
-import { LetterButton } from './LetterButton'
-import { GameBoard } from './GameBoard'
-import { DefinitionsModal } from './DefinitionsModal'
-import { HelpModal } from './HelpModal'
+import LetterButton from './LetterButton'
+import GameBoard from './GameBoard'
+import DefinitionsModal from './DefinitionsModal'
+import HelpModal from './HelpModal'
 import { fetchWordDefinition } from './dictionaryService'
 import { isValidWord } from '../../utils/wordValidation'
 
-const WordGame: React.FC<WordGameProps> = ({ 
-  level, 
-  onLevelComplete, 
-  score, 
-  onScoreUpdate,
-  guessedWords,
-  onGuessedWordsUpdate,
-  subWords
-}) => {
+const WordGame: React.FC<WordGameProps> = (props) => {
+  const { 
+    level, 
+    onLevelComplete, 
+    score, 
+    onScoreUpdate,
+    guessedWords,
+    onGuessedWordsUpdate,
+    subWords = [],
+    setGuessedWords
+  } = props;
+
   const [gameState, setGameState] = useState<GameState>({
-    baseWord: '',
-    subWords: [],
+    baseWord: typeof level === 'object' && level.baseWord ? level.baseWord : '',
+    subWords: subWords || [],
     userInput: '',
     isLoadingDefinitions: false,
     showDefinitions: false,
@@ -38,17 +41,29 @@ const WordGame: React.FC<WordGameProps> = ({
 
   useEffect(() => {
     console.log('Level changed:', level)
-    const currentLevel = LEVELS.find(l => l.index === level) || LEVELS[0]
-    setGameState(prev => ({
-      ...prev,
-      baseWord: currentLevel.baseWord,
-      subWords: currentLevel.subWords,
-      userInput: '',
-      definitions: [],
-      selectedWord: ''
-    }))
+    if (typeof level === 'object' && level.baseWord) {
+      setGameState(prev => ({
+        ...prev,
+        baseWord: level.baseWord,
+        subWords: level.subWords || subWords || [],
+        userInput: '',
+        definitions: [],
+        selectedWord: ''
+      }))
+    } else if (typeof level === 'number') {
+      // Legacy support for level as index
+      const currentLevel = LEVELS.find(l => l.index === level) || LEVELS[0]
+      setGameState(prev => ({
+        ...prev,
+        baseWord: currentLevel.baseWord,
+        subWords: currentLevel.subWords || subWords || [],
+        userInput: '',
+        definitions: [],
+        selectedWord: ''
+      }))
+    }
     setIsLevelComplete(false)
-  }, [level])
+  }, [level, subWords])
 
   const handleLetterClick = (letter: string) => {
     if (!isLevelComplete) {
@@ -73,9 +88,16 @@ const WordGame: React.FC<WordGameProps> = ({
       const definition = await fetchWordDefinition(guess)
       if (definition) {
         const points = gameState.subWords.includes(guess) ? 100 : 200
-        onScoreUpdate(points)
+        onScoreUpdate(score + points)
         const newGuessedWords = [...guessedWords, guess]
-        onGuessedWordsUpdate(newGuessedWords)
+        
+        // Support both function naming styles
+        if (typeof onGuessedWordsUpdate === 'function') {
+          onGuessedWordsUpdate(newGuessedWords)
+        } else if (typeof setGuessedWords === 'function') {
+          setGuessedWords(newGuessedWords)
+        }
+        
         setGameState(prev => ({
           ...prev,
           feedback: {
@@ -183,7 +205,14 @@ const WordGame: React.FC<WordGameProps> = ({
     if (unguessedWords.length > 0) {
       const clueWord = unguessedWords[0]
       const newGuessedWords = [...guessedWords, clueWord]
-      onGuessedWordsUpdate(newGuessedWords)
+      
+      // Support both function naming styles
+      if (typeof onGuessedWordsUpdate === 'function') {
+        onGuessedWordsUpdate(newGuessedWords)
+      } else if (typeof setGuessedWords === 'function') {
+        setGuessedWords(newGuessedWords)
+      }
+      
       setGameState(prev => ({
         ...prev,
         feedback: {
@@ -203,73 +232,197 @@ const WordGame: React.FC<WordGameProps> = ({
   }
 
   return (
-    <Box>
-      <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h5" align="center">
-            Score: {score}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton
-              onClick={handleClue}
-              sx={{ color: '#DAA520' }}
-              size="large"
-              aria-label="clue"
-            >
-              <LightbulbIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => setShowHelp(true)}
-              color="primary"
-              size="large"
-              aria-label="help"
-            >
-              <HelpIcon />
-            </IconButton>
-          </Box>
-        </Grid>
+    <Container disableGutters maxWidth="sm" sx={{ px: 1, py: 1 }}>
+      {/* Header with Score and Icons */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        mb: 1.5,
+      }}>
+        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+          Score: {score}
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton
+            onClick={handleClue}
+            sx={{ color: '#DAA520' }}
+            size="medium"
+            aria-label="clue"
+          >
+            <LightbulbIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => setShowHelp(true)}
+            color="primary"
+            size="medium"
+            aria-label="help"
+          >
+            <HelpIcon />
+          </IconButton>
+        </Box>
+      </Box>
 
-        {isLevelComplete && (
-          <Grid item xs={12}>
-            <Paper 
-              sx={{ 
-                p: 3, 
-                textAlign: 'center', 
-                bgcolor: 'success.light',
-                color: 'white',
-                mb: 2
+      {/* Combined Game Board and Input Area */}
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          borderRadius: 2,
+          backgroundColor: 'background.paper',
+          overflow: 'hidden'
+        }}
+      >
+        {/* Game Board Component with Word Hints */}
+        <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
+          {/* Progress section */}
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            mb: 1 
+          }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+              Progress: 
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {guessedWords.length} / {gameState.subWords.length}
+            </Typography>
+          </Box>
+          
+          <LinearProgress 
+            variant="determinate" 
+            value={guessedWords.length > 0 ? Math.round((guessedWords.length / gameState.subWords.length) * 100) : 0} 
+            sx={{ 
+              height: 6,
+              borderRadius: 3,
+              mb: 1.5,
+              backgroundColor: 'grey.200',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: 3
+              }
+            }} 
+          />
+
+          {/* Word Hints Section */}
+          {gameState.subWords.length > 0 && (
+            <Box sx={{ mb: 1.5 }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                Word Hints:
+              </Typography>
+              <Grid container spacing={0.5}>
+                {gameState.subWords.map((word, wordIndex) => (
+                  <Grid item xs={6} sm={4} key={wordIndex}>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 0.5, 
+                      p: 0.5,
+                      bgcolor: guessedWords.includes(word) ? 'success.light' : 'transparent',
+                      borderRadius: 1,
+                      justifyContent: 'center',
+                      opacity: guessedWords.includes(word) ? 1 : 0.9
+                    }}>
+                      {word.split('').map((letter, letterIndex) => (
+                        <Box
+                          key={letterIndex}
+                          sx={{
+                            width: { xs: 20, sm: 24 },
+                            height: { xs: 20, sm: 24 },
+                            border: '1px solid',
+                            borderColor: guessedWords.includes(word) ? 'success.main' : 'primary.light',
+                            borderRadius: 0.5,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: { xs: '0.6rem', sm: '0.8rem' },
+                            fontWeight: 'bold',
+                            backgroundColor: guessedWords.includes(word) ? 'success.light' : 'background.default',
+                            color: guessedWords.includes(word) ? 'white' : 'text.primary',
+                          }}
+                        >
+                          {letterIndex === 0 || guessedWords.includes(word) ? letter.toUpperCase() : ''}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
+
+          {/* Found Words Section */}
+          <Box sx={{ mb: 1.5 }}>
+            <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+              Found Words:
+            </Typography>
+            {guessedWords.length > 0 ? (
+              <Box sx={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: 0.5 
+              }}>
+                {guessedWords.map((word, index) => (
+                  <Chip
+                    key={index}
+                    label={word.toUpperCase()}
+                    size="small"
+                    sx={{
+                      backgroundColor: 'primary.light',
+                      color: 'primary.contrastText',
+                      fontSize: '0.75rem',
+                      height: 'auto',
+                      '& .MuiChip-label': {
+                        px: 1,
+                        py: 0.5
+                      }
+                    }}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary" fontSize="0.75rem">
+                No words found yet
+              </Typography>
+            )}
+          </Box>
+
+          {/* Definitions Button */}
+          {guessedWords.length > 0 && (
+            <Button
+              variant="outlined"
+              onClick={handleShowDefinitions}
+              size="small"
+              fullWidth
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                py: 0.5,
+                mb: 1
               }}
             >
-              <Typography variant="h5" gutterBottom>
-                🎉 Congratulations! 🎉
-              </Typography>
-              <Typography variant="body1" gutterBottom>
-                You've completed this level! You're doing great!
-              </Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleNextLevel}
-                sx={{ mt: 2 }}
-              >
-                Continue to Next Level
-              </Button>
-            </Paper>
-          </Grid>
-        )}
-
-        <Grid item xs={12}>
-          <GameBoard
-            subWords={gameState.subWords}
-            guessedWords={guessedWords}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
+              Show Definitions
+            </Button>
+          )}
+        </Box>
+        
+        {/* Divider */}
+        <Box sx={{ height: '1px', bgcolor: 'divider' }} />
+        
+        {/* Input Area */}
+        <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
+          {/* Word Input Field */}
           <TextField
             fullWidth
             value={gameState.userInput}
             placeholder={isLevelComplete ? "Level Complete!" : "Type your guess..."}
+            sx={{
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 1.5,
+                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                backgroundColor: 'background.default',
+                height: { xs: 45, sm: 56 }
+              }
+            }}
             InputProps={{
               readOnly: true,
               endAdornment: (
@@ -296,10 +449,15 @@ const WordGame: React.FC<WordGameProps> = ({
               )
             }}
           />
-        </Grid>
 
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {/* Letter Buttons Grid */}
+          <Box sx={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            justifyContent: 'center',
+            gap: { xs: 0.75, sm: 1 },
+            mb: 2
+          }}>
             {gameState.baseWord.split('').map((letter, index) => (
               <LetterButton
                 key={index}
@@ -309,29 +467,62 @@ const WordGame: React.FC<WordGameProps> = ({
               />
             ))}
           </Box>
-        </Grid>
 
-        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+          {/* Submit Button */}
           <Button
             variant="contained"
             onClick={handleSubmit}
             disabled={!gameState.userInput || isLevelComplete}
+            fullWidth
+            size="medium"
+            sx={{
+              py: { xs: 1, sm: 1.5 },
+              fontSize: { xs: '0.95rem', sm: '1.1rem' },
+              borderRadius: 1.5,
+              textTransform: 'none'
+            }}
           >
             Submit
           </Button>
-          {guessedWords.length > 0 && (
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleShowDefinitions}
-              disabled={gameState.isLoadingDefinitions}
-            >
-              Show Definitions
-            </Button>
-          )}
-        </Grid>
-      </Grid>
+        </Box>
+      </Paper>
 
+      {/* Level Complete Message */}
+      {isLevelComplete && (
+        <Paper 
+          sx={{ 
+            p: 3, 
+            textAlign: 'center', 
+            bgcolor: 'success.light',
+            color: 'white',
+            mt: 1.5,
+            borderRadius: 2
+          }}
+        >
+          <Typography variant="h5" gutterBottom>
+            🎉 Level Complete! 🎉
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            Great job! Ready for the next challenge?
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={handleNextLevel}
+            sx={{ 
+              mt: 2,
+              bgcolor: 'white',
+              color: 'success.dark',
+              '&:hover': {
+                bgcolor: 'grey.100'
+              }
+            }}
+          >
+            Next Level
+          </Button>
+        </Paper>
+      )}
+
+      {/* Modals */}
       <DefinitionsModal
         open={gameState.showDefinitions}
         onClose={handleCloseDefinitions}
@@ -342,11 +533,17 @@ const WordGame: React.FC<WordGameProps> = ({
         isLoadingDefinitions={gameState.isLoadingDefinitions}
       />
 
+      <HelpModal
+        open={showHelp}
+        onClose={() => setShowHelp(false)}
+      />
+
+      {/* Feedback Snackbar */}
       <Snackbar
         open={gameState.feedback.open}
         autoHideDuration={2000}
         onClose={handleCloseFeedback}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert 
           onClose={handleCloseFeedback} 
@@ -357,12 +554,7 @@ const WordGame: React.FC<WordGameProps> = ({
           {gameState.feedback.message}
         </Alert>
       </Snackbar>
-
-      <HelpModal
-        open={showHelp}
-        onClose={() => setShowHelp(false)}
-      />
-    </Box>
+    </Container>
   )
 }
 

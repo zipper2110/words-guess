@@ -1,27 +1,29 @@
 import { Button } from '@mui/material'
-import { styled } from '@mui/material/styles'
+import { LetterButtonProps } from './types'
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  width: '48px',
-  height: '48px',
-  margin: '4px',
-  borderRadius: '8px',
-}))
-
-interface LetterButtonProps {
-  letter: string;
-  onClick: () => void;
-  disabled?: boolean;
-}
-
-export const LetterButton: React.FC<LetterButtonProps> = ({ letter, onClick, disabled }) => {
+const LetterButton: React.FC<LetterButtonProps> = ({ letter, onClick, disabled = false }) => {
   return (
-    <StyledButton
+    <Button
       variant="contained"
       onClick={onClick}
       disabled={disabled}
+      sx={{
+        width: { xs: 38, sm: 45 },
+        height: { xs: 48, sm: 56 },
+        minWidth: { xs: 38, sm: 45 },
+        p: 0,
+        fontSize: { xs: '1rem', sm: '1.2rem' },
+        fontWeight: 'bold',
+        borderRadius: 1.5,
+        backgroundColor: disabled ? 'grey.300' : 'primary.main',
+        '&:hover': {
+          backgroundColor: disabled ? 'grey.300' : 'primary.dark',
+        },
+      }}
     >
       {letter}
-    </StyledButton>
+    </Button>
   )
-} 
+}
+
+export default LetterButton 

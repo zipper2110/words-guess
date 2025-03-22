@@ -1,0 +1,6 @@
+src/App.tsx
+src/components/WordGame/DefinitionsModal.tsx
+src/components/WordGame/GameBoard.tsx
+src/components/WordGame/LetterButton.tsx
+src/components/WordGame/WordGame.tsx
+src/components/WordGame/types.ts
