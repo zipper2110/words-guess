@@ -63,6 +63,7 @@ const WordGame: React.FC<WordGameProps> = (props) => {
         onThemeToggle={onThemeToggle}
         onMenuOpen={onMenuOpen}
         isDarkMode={isDarkMode}
+        onClue={handleClue}
       />
 
       {/* Combined Game Board and Input Area */}

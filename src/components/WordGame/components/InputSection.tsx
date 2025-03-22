@@ -52,6 +52,8 @@ const InputSection: React.FC<InputSectionProps> = ({
                 onClick={onBackspace}
                 disabled={!userInput || isLevelComplete}
                 size="small"
+                data-testid="backspace-button"
+                aria-label="Backspace"
               >
                 <BackspaceIcon />
               </IconButton>
@@ -59,6 +61,8 @@ const InputSection: React.FC<InputSectionProps> = ({
                 onClick={onClear}
                 disabled={!userInput || isLevelComplete}
                 size="small"
+                data-testid="clear-button"
+                aria-label="Clear"
               >
                 <ClearIcon />
               </IconButton>

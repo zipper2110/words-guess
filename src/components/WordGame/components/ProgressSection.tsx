@@ -1,4 +1,4 @@
-import { Box, Typography, Grid, Chip, Button, LinearProgress } from '@mui/material'
+import { Box, Typography, Grid, Chip, Button, LinearProgress, useTheme } from '@mui/material'
 
 interface ProgressSectionProps {
   subWords: string[]
@@ -13,6 +13,9 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
   onShowDefinitions,
   isLevelComplete
 }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+  
   return (
     <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
       {/* Progress section */}
@@ -37,9 +40,10 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
           height: 6,
           borderRadius: 3,
           mb: 1.5,
-          backgroundColor: 'grey.200',
+          backgroundColor: isDarkMode ? 'grey.700' : 'grey.200',
           '& .MuiLinearProgress-bar': {
-            borderRadius: 3
+            borderRadius: 3,
+            backgroundColor: isDarkMode ? 'primary.light' : 'primary.main'
           }
         }} 
       />
@@ -66,16 +70,16 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
                     <Box
                       key={letterIndex}
                       sx={{
-                        width: { xs: 20, sm: 24 },
-                        height: { xs: 20, sm: 24 },
+                        width: { xs: 24, sm: 28 },
+                        height: { xs: 24, sm: 28 },
                         border: '1px solid',
                         borderColor: guessedWords.includes(word) ? 'success.main' : 'primary.light',
                         borderRadius: 0.5,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: { xs: '0.6rem', sm: '0.8rem' },
-                        fontWeight: 'bold',
+                        fontSize: { xs: '0.75rem', sm: '0.9rem' },
+                        fontWeight: 800,
                         backgroundColor: guessedWords.includes(word) ? 'success.light' : 'background.default',
                         color: guessedWords.includes(word) ? 'white' : 'text.primary',
                       }}
@@ -92,7 +96,14 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
 
       {/* Found Words Section */}
       <Box sx={{ mb: 1.5 }}>
-        <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+        <Typography 
+          variant="subtitle1" 
+          sx={{ 
+            mb: 0.5, 
+            fontWeight: 'bold',
+            fontSize: '1.1rem'
+          }}
+        >
           Found Words:
         </Typography>
         {guessedWords.length > 0 ? (
@@ -108,12 +119,13 @@ const ProgressSection: React.FC<ProgressSectionProps> = ({
                 size="small"
                 sx={{
                   backgroundColor: 'primary.light',
-                  color: 'primary.contrastText',
-                  fontSize: '0.75rem',
+                  color: 'white',
+                  fontSize: '0.85rem',
+                  fontWeight: 'bold',
                   height: 'auto',
                   '& .MuiChip-label': {
-                    px: 1,
-                    py: 0.5
+                    px: 1.5,
+                    py: 0.6
                   }
                 }}
               />

@@ -1,6 +1,7 @@
 import { Box, Typography, IconButton, SvgIcon } from '@mui/material'
 import HelpIcon from '@mui/icons-material/Help'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+import LightbulbIcon from '@mui/icons-material/Lightbulb'
 import { LEVELS } from '../../../data/levels'
 import { Level } from '../types'
 
@@ -10,6 +11,7 @@ interface GameHeaderProps {
   onHelpClick: () => void
   onThemeToggle?: () => void
   onMenuOpen?: (event: React.MouseEvent<HTMLElement>) => void
+  onClue?: () => void
   isDarkMode?: boolean
 }
 
@@ -19,6 +21,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onHelpClick,
   onThemeToggle = () => {},
   onMenuOpen = () => {},
+  onClue = () => {},
   isDarkMode = false
 }) => {
   const levelIndex = typeof level === 'object' ? level.index || 1 : level
@@ -38,7 +41,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           flex: '0 0 auto'
         }}
       >
-        Level {levelIndex}/{LEVELS.length}
+        Level {levelIndex}
       </Typography>
       <Box sx={{ 
         display: 'flex',
@@ -112,6 +115,21 @@ const GameHeader: React.FC<GameHeaderProps> = ({
               <path fill="currentColor" d="M233.54 142.23a8 8 0 0 0-8-2a88.08 88.08 0 0 1-109.8-109.8a8 8 0 0 0-10-10a104.84 104.84 0 0 0-52.91 37A104 104 0 0 0 136 224a103.09 103.09 0 0 0 62.52-20.88a104.84 104.84 0 0 0 37-52.91a8 8 0 0 0-1.98-7.98Zm-44.64 48.11A88 88 0 0 1 65.66 67.11a89 89 0 0 1 31.4-26A106 106 0 0 0 96 56a104.11 104.11 0 0 0 104 104a106 106 0 0 0 14.92-1.06a89 89 0 0 1-26.02 31.4Z"/>
             </SvgIcon>
           )}
+        </IconButton>
+        <IconButton
+          onClick={onClue}
+          size="medium"
+          aria-label="get clue"
+          sx={{
+            color: '#DAA520',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              color: '#FFD700',
+              transform: 'scale(1.1)'
+            }
+          }}
+        >
+          <LightbulbIcon />
         </IconButton>
         <IconButton
           onClick={onMenuOpen}

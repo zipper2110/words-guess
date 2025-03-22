@@ -130,15 +130,6 @@ function App() {
               </ListItemIcon>
               <ListItemText>Admin</ListItemText>
             </MenuItem>
-            <MenuItem 
-              onClick={handleClue}
-              sx={{ minWidth: 150 }}
-            >
-              <ListItemIcon>
-                <LightbulbIcon fontSize="small" sx={{ color: '#DAA520' }} />
-              </ListItemIcon>
-              <ListItemText>Get Clue</ListItemText>
-            </MenuItem>
           </Menu>
 
           <Routes>

@@ -40,7 +40,7 @@ export async function validateLevelWords(baseWord: string, subWords: string[]): 
   
   // Check if each word can be formed from base word
   subWords.forEach(word => {
-    if (isValidWord(word, baseWord)) {
+    if (isValidWord(word, baseWord) || word.toUpperCase() === baseWord.toUpperCase()) {
       valid.push(word)
     } else {
       invalid.push(word)
@@ -78,6 +78,11 @@ export async function validateLevelWords(baseWord: string, subWords: string[]): 
 export function isValidWord(word: string, baseWord: string): boolean {
   // Don't allow the exact base word
   if (word.toLowerCase() === baseWord.toLowerCase()) {
+    return false;
+  }
+  
+  // Check for special characters - return false if found in either word
+  if (/[^a-zA-Z]/.test(word) || /[^a-zA-Z]/.test(baseWord)) {
     return false;
   }
   
