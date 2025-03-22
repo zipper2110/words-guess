@@ -14,7 +14,7 @@ export const createFeedbackState = (message: string, type: 'success' | 'error' =
 export const resetGameState = (letterCounts: Record<string, number>) => ({
   userInput: '',
   availableLetters: { ...letterCounts },
-  feedback: createFeedbackState('')
+  feedback: { message: '', type: 'success', open: false }
 })
 
 export const updateGuessedWords = (
