@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Box, Button, TextField, Grid, Typography, Snackbar, Alert, Paper, IconButton } from '@mui/material'
 import HelpIcon from '@mui/icons-material/Help'
+import BackspaceIcon from '@mui/icons-material/Backspace'
+import ClearIcon from '@mui/icons-material/Clear'
 import { LEVELS } from '../../data/levels'
 import { WordGameProps, GameState, FeedbackState, WordDefinition } from './types'
 import { LetterButton } from './LetterButton'
@@ -116,6 +118,15 @@ const WordGame: React.FC<WordGameProps> = ({
       setGameState(prev => ({
         ...prev,
         userInput: prev.userInput.slice(0, -1)
+      }))
+    }
+  }
+
+  const handleClear = () => {
+    if (!isLevelComplete) {
+      setGameState(prev => ({
+        ...prev,
+        userInput: ''
       }))
     }
   }
@@ -250,6 +261,28 @@ const WordGame: React.FC<WordGameProps> = ({
             placeholder={isLevelComplete ? "Level Complete!" : "Type your guess..."}
             InputProps={{
               readOnly: true,
+              endAdornment: (
+                <Box sx={{ 
+                  visibility: gameState.userInput ? 'visible' : 'hidden',
+                  display: 'flex',
+                  gap: 0.5
+                }}>
+                  <IconButton
+                    onClick={handleBackspace}
+                    disabled={!gameState.userInput || isLevelComplete}
+                    size="small"
+                  >
+                    <BackspaceIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={handleClear}
+                    disabled={!gameState.userInput || isLevelComplete}
+                    size="small"
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </Box>
+              )
             }}
           />
         </Grid>
@@ -268,13 +301,6 @@ const WordGame: React.FC<WordGameProps> = ({
         </Grid>
 
         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-          <Button
-            variant="outlined"
-            onClick={handleBackspace}
-            disabled={!gameState.userInput || isLevelComplete}
-          >
-            Backspace
-          </Button>
           <Button
             variant="contained"
             onClick={handleSubmit}
