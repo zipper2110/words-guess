@@ -1,7 +1,9 @@
-import { Box, Typography, IconButton, SvgIcon } from '@mui/material'
-import HelpIcon from '@mui/icons-material/Help'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import LightbulbIcon from '@mui/icons-material/Lightbulb'
+import { Box, Typography, IconButton } from '@mui/material'
+import { FaQuestionCircle } from 'react-icons/fa'
+import { BsThreeDotsVertical } from 'react-icons/bs'
+import { GiLightBulb } from 'react-icons/gi'
+import { WiDaySunny } from 'react-icons/wi'
+import { WiMoonAltWaningCrescent4 } from 'react-icons/wi'
 import { LEVELS } from '../../../data/levels'
 import { Level } from '../types'
 
@@ -78,8 +80,14 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           color="primary"
           size="medium"
           aria-label="help"
+          sx={{ 
+            color: '#4e7ac7',
+            '&:hover': {
+              color: '#3f51b5',
+            }
+          }}
         >
-          <HelpIcon />
+          <FaQuestionCircle size={24} />
         </IconButton>
         <IconButton 
           onClick={onThemeToggle}
@@ -90,30 +98,14 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             transition: 'all 0.2s ease',
             '&:hover': {
               color: isDarkMode ? '#ffeb3b' : '#3f51b5',
-              transform: 'rotate(12deg) scale(1.1)'
+              transform: 'rotate(12deg) scale(1.05)'
             }
           }}
         >
           {isDarkMode ? (
-            <SvgIcon 
-              sx={{ 
-                fontSize: 22,
-                filter: 'drop-shadow(0 0 4px rgba(253, 216, 53, 0.6))'
-              }}
-              viewBox="0 0 24 24"
-            >
-              <path fill="currentColor" d="M12 17.5q2.3 0 3.9-1.6t1.6-3.9q0-2.3-1.6-3.9T12 6.5q-2.3 0-3.9 1.6T6.5 12q0 2.3 1.6 3.9t3.9 1.6ZM1 13q-.425 0-.712-.288T0 12q0-.425.288-.712T1 11h2q.425 0 .713.288T4 12q0 .425-.288.713T3 13H1Zm18 0q-.425 0-.712-.288T18 12q0-.425.288-.712T19 11h2q.425 0 .713.288T22 12q0 .425-.288.713T21 13h-2ZM11 4q0-.425.288-.712T12 3q.425 0 .713.288T13 4v2q0 .425-.288.713T12 7q-.425 0-.712-.288T11 6V4ZM11 18q0-.425.288-.712T12 17q.425 0 .713.288T13 18v2q0 .425-.288.713T12 21q-.425 0-.712-.288T11 20v-2ZM5.65 7.05L4.575 6q-.3-.275-.288-.7t.288-.725q.3-.3.725-.3t.7.3L7.05 5.65q.275.3.275.7t-.275.7q-.275.3-.687.288T5.65 7.05ZM18 19.425l-1.05-1.075q-.275-.3-.275-.712t.275-.688q.275-.3.688-.3t.712.3L19.425 18q.3.275.288.7t-.288.725q-.3.3-.725.3t-.7-.3ZM16.95 7.05q-.3-.275-.3-.675t.3-.7L18 4.575q.275-.3.7-.287t.725.287q.3.3.3.725t-.3.7L18.35 7.05q-.3.275-.7.275t-.7-.275ZM4.575 19.425q-.3-.3-.287-.725t.287-.7l1.075-1.05q.3-.275.713-.275t.687.275q.3.275.3.688t-.3.712l-1.075 1.05q-.275.3-.7.288t-.725-.288Z"/>
-            </SvgIcon>
+            <WiDaySunny size={30} style={{ filter: 'drop-shadow(0 0 4px rgba(253, 216, 53, 0.6))' }} />
           ) : (
-            <SvgIcon 
-              sx={{ 
-                fontSize: 22,
-                filter: 'drop-shadow(0 0 4px rgba(92, 107, 192, 0.6))'
-              }}
-              viewBox="0 0 256 256"
-            >
-              <path fill="currentColor" d="M233.54 142.23a8 8 0 0 0-8-2a88.08 88.08 0 0 1-109.8-109.8a8 8 0 0 0-10-10a104.84 104.84 0 0 0-52.91 37A104 104 0 0 0 136 224a103.09 103.09 0 0 0 62.52-20.88a104.84 104.84 0 0 0 37-52.91a8 8 0 0 0-1.98-7.98Zm-44.64 48.11A88 88 0 0 1 65.66 67.11a89 89 0 0 1 31.4-26A106 106 0 0 0 96 56a104.11 104.11 0 0 0 104 104a106 106 0 0 0 14.92-1.06a89 89 0 0 1-26.02 31.4Z"/>
-            </SvgIcon>
+            <WiMoonAltWaningCrescent4 size={30} style={{ filter: 'drop-shadow(0 0 4px rgba(92, 107, 192, 0.6))' }} />
           )}
         </IconButton>
         <IconButton
@@ -125,11 +117,11 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             transition: 'all 0.2s ease',
             '&:hover': {
               color: '#FFD700',
-              transform: 'scale(1.1)'
+              transform: 'scale(1.05)'
             }
           }}
         >
-          <LightbulbIcon />
+          <GiLightBulb size={24} />
         </IconButton>
         <IconButton
           onClick={onMenuOpen}
@@ -137,7 +129,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           size="medium"
           aria-label="menu"
         >
-          <MoreVertIcon />
+          <BsThreeDotsVertical size={22} />
         </IconButton>
       </Box>
     </Box>
