@@ -33,7 +33,9 @@ const WordGame: React.FC<WordGameProps> = (props) => {
     showDefinitions: false,
     definitions: [],
     selectedWord: '',
-    feedback: { message: '', type: 'success', open: false }
+    feedback: { message: '', type: 'success', open: false },
+    letterCounts: {},
+    availableLetters: {}
   })
 
   const [isLevelComplete, setIsLevelComplete] = useState(false)
@@ -41,33 +43,53 @@ const WordGame: React.FC<WordGameProps> = (props) => {
 
   useEffect(() => {
     console.log('Level changed:', level)
+    const initializeLetterCounts = (word: string) => {
+      const counts: Record<string, number> = {}
+      word.split('').forEach(letter => {
+        counts[letter] = (counts[letter] || 0) + 1
+      })
+      return counts
+    }
+
     if (typeof level === 'object' && level.baseWord) {
+      const letterCounts = initializeLetterCounts(level.baseWord)
       setGameState(prev => ({
         ...prev,
         baseWord: level.baseWord,
         subWords: level.subWords || subWords || [],
         userInput: '',
         definitions: [],
-        selectedWord: ''
+        selectedWord: '',
+        letterCounts,
+        availableLetters: { ...letterCounts }
       }))
     } else if (typeof level === 'number') {
-      // Legacy support for level as index
       const currentLevel = LEVELS.find(l => l.index === level) || LEVELS[0]
+      const letterCounts = initializeLetterCounts(currentLevel.baseWord)
       setGameState(prev => ({
         ...prev,
         baseWord: currentLevel.baseWord,
         subWords: currentLevel.subWords || subWords || [],
         userInput: '',
         definitions: [],
-        selectedWord: ''
+        selectedWord: '',
+        letterCounts,
+        availableLetters: { ...letterCounts }
       }))
     }
     setIsLevelComplete(false)
   }, [level, subWords])
 
   const handleLetterClick = (letter: string) => {
-    if (!isLevelComplete) {
-      setGameState(prev => ({ ...prev, userInput: prev.userInput + letter }))
+    if (!isLevelComplete && gameState.availableLetters[letter] > 0) {
+      setGameState(prev => ({
+        ...prev,
+        userInput: prev.userInput + letter,
+        availableLetters: {
+          ...prev.availableLetters,
+          [letter]: prev.availableLetters[letter] - 1
+        }
+      }))
     }
   }
 
@@ -77,6 +99,8 @@ const WordGame: React.FC<WordGameProps> = (props) => {
     if (guessedWords.includes(guess)) {
       setGameState(prev => ({
         ...prev,
+        userInput: '',
+        availableLetters: { ...prev.letterCounts },
         feedback: {
           message: 'You already found this word!',
           type: 'error',
@@ -100,6 +124,8 @@ const WordGame: React.FC<WordGameProps> = (props) => {
         
         setGameState(prev => ({
           ...prev,
+          userInput: '',
+          availableLetters: { ...prev.letterCounts },
           feedback: {
             message: `Correct word! +${points} points!`,
             type: 'success',
@@ -116,6 +142,8 @@ const WordGame: React.FC<WordGameProps> = (props) => {
       } else {
         setGameState(prev => ({
           ...prev,
+          userInput: '',
+          availableLetters: { ...prev.letterCounts },
           feedback: {
             message: 'Not a valid English word. Try again!',
             type: 'error',
@@ -126,6 +154,8 @@ const WordGame: React.FC<WordGameProps> = (props) => {
     } else {
       setGameState(prev => ({
         ...prev,
+        userInput: '',
+        availableLetters: { ...prev.letterCounts },
         feedback: {
           message: 'Not a valid word. Try again!',
           type: 'error',
@@ -133,25 +163,30 @@ const WordGame: React.FC<WordGameProps> = (props) => {
         }
       }))
     }
-    setGameState(prev => ({ ...prev, userInput: '' }))
   }
 
   const handleBackspace = () => {
-    if (!isLevelComplete) {
-      setGameState(prev => ({
+    setGameState(prev => {
+      if (!prev.userInput) return prev
+      
+      const lastLetter = prev.userInput[prev.userInput.length - 1]
+      return {
         ...prev,
-        userInput: prev.userInput.slice(0, -1)
-      }))
-    }
+        userInput: prev.userInput.slice(0, -1),
+        availableLetters: {
+          ...prev.availableLetters,
+          [lastLetter]: prev.availableLetters[lastLetter] + 1
+        }
+      }
+    })
   }
 
   const handleClear = () => {
-    if (!isLevelComplete) {
-      setGameState(prev => ({
-        ...prev,
-        userInput: ''
-      }))
-    }
+    setGameState(prev => ({
+      ...prev,
+      userInput: '',
+      availableLetters: { ...prev.letterCounts }
+    }))
   }
 
   const handleCloseFeedback = () => {
@@ -460,10 +495,11 @@ const WordGame: React.FC<WordGameProps> = (props) => {
           }}>
             {gameState.baseWord.split('').map((letter, index) => (
               <LetterButton
-                key={index}
+                key={`${letter}-${index}`}
                 letter={letter}
                 onClick={() => handleLetterClick(letter)}
-                disabled={isLevelComplete}
+                disabled={isLevelComplete || gameState.availableLetters[letter] === 0}
+                remainingCount={gameState.availableLetters[letter]}
               />
             ))}
           </Box>

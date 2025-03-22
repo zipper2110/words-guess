@@ -36,12 +36,15 @@ export interface GameState {
   definitions: WordDefinition[];
   selectedWord: string;
   feedback: FeedbackState;
+  letterCounts: Record<string, number>;
+  availableLetters: Record<string, number>;
 }
 
 export interface LetterButtonProps {
   letter: string;
   onClick: () => void;
   disabled?: boolean;
+  remainingCount?: number;
 }
 
 export interface GameBoardProps {
