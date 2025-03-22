@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react'
 import { LEVELS } from '../../../data/levels'
-import { GameState, FeedbackState, WordDefinition, Level } from '../types'
-import { fetchWordDefinition } from '../dictionaryService'
-import { isValidWord } from '../../../utils/wordValidation'
+import { GameState, Level } from '../types'
+import { countLetters, resetGameState } from '../../../utils/wordUtils'
+import { useLetterHandling } from './useLetterHandling'
+import { useDefinitions } from './useDefinitions'
+import { useClueSystem } from './useClueSystem'
+import { useWordSubmission } from './useWordSubmission'
 
 interface UseGameStateProps {
   level: Level | number
@@ -43,151 +46,28 @@ export const useGameState = (props: UseGameStateProps) => {
   const [showHelp, setShowHelp] = useState(false)
 
   useEffect(() => {
-    const initializeLetterCounts = (word: string) => {
-      const counts: Record<string, number> = {}
-      word.split('').forEach(letter => {
-        counts[letter] = (counts[letter] || 0) + 1
-      })
-      return counts
-    }
-
     if (typeof level === 'object' && level.baseWord) {
-      const letterCounts = initializeLetterCounts(level.baseWord)
+      const letterCounts = countLetters(level.baseWord)
       setGameState(prev => ({
         ...prev,
         baseWord: level.baseWord,
         subWords: level.subWords || subWords || [],
-        userInput: '',
-        definitions: [],
-        selectedWord: '',
+        ...resetGameState(letterCounts),
         letterCounts,
-        availableLetters: { ...letterCounts }
       }))
     } else if (typeof level === 'number') {
       const currentLevel = LEVELS.find(l => l.index === level) || LEVELS[0]
-      const letterCounts = initializeLetterCounts(currentLevel.baseWord)
+      const letterCounts = countLetters(currentLevel.baseWord)
       setGameState(prev => ({
         ...prev,
         baseWord: currentLevel.baseWord,
         subWords: currentLevel.subWords || subWords || [],
-        userInput: '',
-        definitions: [],
-        selectedWord: '',
+        ...resetGameState(letterCounts),
         letterCounts,
-        availableLetters: { ...letterCounts }
       }))
     }
     setIsLevelComplete(false)
   }, [level, subWords])
-
-  const handleLetterClick = (letter: string) => {
-    if (!isLevelComplete && gameState.availableLetters[letter] > 0) {
-      setGameState(prev => ({
-        ...prev,
-        userInput: prev.userInput + letter,
-        availableLetters: {
-          ...prev.availableLetters,
-          [letter]: prev.availableLetters[letter] - 1
-        }
-      }))
-    }
-  }
-
-  const handleSubmit = async () => {
-    const guess = gameState.userInput.toUpperCase()
-    
-    if (guessedWords.includes(guess)) {
-      setGameState(prev => ({
-        ...prev,
-        userInput: '',
-        availableLetters: { ...prev.letterCounts },
-        feedback: {
-          message: 'You already found this word!',
-          type: 'error',
-          open: true
-        }
-      }))
-    } else if (isValidWord(guess, gameState.baseWord)) {
-      // Check if it's a real word using the dictionary API
-      const definition = await fetchWordDefinition(guess)
-      if (definition) {
-        const points = gameState.subWords.includes(guess) ? 100 : 200
-        onScoreUpdate(score + points)
-        const newGuessedWords = [...guessedWords, guess]
-        
-        // Support both function naming styles
-        if (typeof onGuessedWordsUpdate === 'function') {
-          onGuessedWordsUpdate(newGuessedWords)
-        } else if (typeof setGuessedWords === 'function') {
-          setGuessedWords(newGuessedWords)
-        }
-        
-        setGameState(prev => ({
-          ...prev,
-          userInput: '',
-          availableLetters: { ...prev.letterCounts },
-          feedback: {
-            message: `Correct word! +${points} points!`,
-            type: 'success',
-            open: true
-          }
-        }))
-        
-        const foundAllSubWords = gameState.subWords.every(word => 
-          newGuessedWords.includes(word)
-        )
-        if (foundAllSubWords) {
-          setIsLevelComplete(true)
-        }
-      } else {
-        setGameState(prev => ({
-          ...prev,
-          userInput: '',
-          availableLetters: { ...prev.letterCounts },
-          feedback: {
-            message: 'Not a valid English word. Try again!',
-            type: 'error',
-            open: true
-          }
-        }))
-      }
-    } else {
-      setGameState(prev => ({
-        ...prev,
-        userInput: '',
-        availableLetters: { ...prev.letterCounts },
-        feedback: {
-          message: 'Not a valid word. Try again!',
-          type: 'error',
-          open: true
-        }
-      }))
-    }
-  }
-
-  const handleBackspace = () => {
-    setGameState(prev => {
-      if (!prev.userInput) return prev
-      
-      const lastLetter = prev.userInput[prev.userInput.length - 1]
-      return {
-        ...prev,
-        userInput: prev.userInput.slice(0, -1),
-        availableLetters: {
-          ...prev.availableLetters,
-          [lastLetter]: prev.availableLetters[lastLetter] + 1
-        }
-      }
-    })
-  }
-
-  const handleClear = () => {
-    setGameState(prev => ({
-      ...prev,
-      userInput: '',
-      availableLetters: { ...prev.letterCounts }
-    }))
-  }
 
   const handleCloseFeedback = () => {
     setGameState(prev => ({
@@ -196,93 +76,26 @@ export const useGameState = (props: UseGameStateProps) => {
     }))
   }
 
-  const handleShowDefinitions = async () => {
-    setGameState(prev => ({
-      ...prev,
-      isLoadingDefinitions: true,
-      showDefinitions: true
-    }))
-    
-    const newDefinitions: WordDefinition[] = []
-    for (const word of guessedWords) {
-      const definition = await fetchWordDefinition(word)
-      if (definition) {
-        newDefinitions.push(definition)
-      }
-    }
-    
-    setGameState(prev => ({
-      ...prev,
-      definitions: newDefinitions,
-      isLoadingDefinitions: false
-    }))
-  }
-
-  const handleWordSelect = (word: string) => {
-    setGameState(prev => ({ ...prev, selectedWord: word }))
-  }
-
-  const handleCloseDefinitions = () => {
-    setGameState(prev => ({
-      ...prev,
-      showDefinitions: false,
-      selectedWord: ''
-    }))
-  }
-
-  const handleClue = () => {
-    const unguessedWords = gameState.subWords.filter(word => !guessedWords.includes(word))
-    if (unguessedWords.length > 0) {
-      const clueWord = unguessedWords[0]
-      const revealedPositions = gameState.revealedLetters[clueWord] || new Set<number>([0])
-      
-      // Find the next unrevealed position (start from 1 since first letter is always revealed)
-      let nextPosition = 1
-      while (nextPosition < clueWord.length && revealedPositions.has(nextPosition)) {
-        nextPosition++
-      }
-      
-      if (nextPosition < clueWord.length) {
-        const newRevealedPositions = new Set([...revealedPositions, nextPosition])
-        
-        // Check if all letters are now revealed
-        const allLettersRevealed = nextPosition === clueWord.length - 1
-        
-        setGameState(prev => ({
-          ...prev,
-          revealedLetters: {
-            ...prev.revealedLetters,
-            [clueWord]: newRevealedPositions
-          },
-          feedback: {
-            message: allLettersRevealed 
-              ? `All letters revealed! The word is "${clueWord}"!`
-              : `Clue: The letter '${clueWord[nextPosition]}' appears in position ${nextPosition + 1} of one of the remaining words`,
-            type: 'success',
-            open: true
-          }
-        }))
-
-        // If all letters are revealed, add the word to guessed words
-        if (allLettersRevealed) {
-          const newGuessedWords = [...guessedWords, clueWord]
-          if (typeof onGuessedWordsUpdate === 'function') {
-            onGuessedWordsUpdate(newGuessedWords)
-          } else if (typeof setGuessedWords === 'function') {
-            setGuessedWords(newGuessedWords)
-          }
-          
-          // Check if level is complete
-          const foundAllSubWords = gameState.subWords.every(word => 
-            newGuessedWords.includes(word)
-          )
-          if (foundAllSubWords) {
-            setIsLevelComplete(true)
-          }
-        }
-      }
-    }
-  }
+  const letterHandling = useLetterHandling(gameState, setGameState, isLevelComplete)
+  const definitions = useDefinitions(gameState, setGameState, guessedWords)
+  const clueSystem = useClueSystem(
+    gameState, 
+    setGameState, 
+    guessedWords, 
+    onGuessedWordsUpdate, 
+    setGuessedWords,
+    setIsLevelComplete
+  )
+  const wordSubmission = useWordSubmission(
+    gameState,
+    setGameState,
+    guessedWords,
+    score,
+    onScoreUpdate,
+    onGuessedWordsUpdate,
+    setGuessedWords,
+    setIsLevelComplete
+  )
 
   return {
     gameState,
@@ -290,14 +103,10 @@ export const useGameState = (props: UseGameStateProps) => {
     showHelp,
     setShowHelp,
     setIsLevelComplete,
-    handleLetterClick,
-    handleSubmit,
-    handleBackspace,
-    handleClear,
     handleCloseFeedback,
-    handleShowDefinitions,
-    handleWordSelect,
-    handleCloseDefinitions,
-    handleClue
+    ...letterHandling,
+    ...definitions,
+    ...clueSystem,
+    ...wordSubmission
   }
 } 

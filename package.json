@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "validate": "tsx src/scripts/validateLevels.ts",
     "sort-subwords": "tsx src/scripts/sortSubwords.ts",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui"
   },

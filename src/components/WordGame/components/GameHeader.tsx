@@ -1,9 +1,9 @@
 import { Box, Typography, IconButton } from '@mui/material'
 import { FaQuestionCircle } from 'react-icons/fa'
-import { BsThreeDotsVertical } from 'react-icons/bs'
 import { GiLightBulb } from 'react-icons/gi'
 import { WiDaySunny } from 'react-icons/wi'
 import { WiMoonAltWaningCrescent4 } from 'react-icons/wi'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { LEVELS } from '../../../data/levels'
 import { Level } from '../types'
 import { useTranslation } from 'react-i18next'
@@ -131,7 +131,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           size="medium"
           aria-label="menu"
         >
-          <BsThreeDotsVertical size={22} />
+          <MoreVertIcon />
         </IconButton>
       </Box>
     </Box>

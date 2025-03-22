@@ -1,6 +1,7 @@
+import './i18n'
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
-import { Container, Typography, Box, Button, ThemeProvider, CssBaseline, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material'
+import { Container, Typography, Box, Button, ThemeProvider, CssBaseline, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Menu, MenuItem, ListItemIcon, ListItemText, Divider } from '@mui/material'
 import { lightTheme, darkTheme } from './theme'
 import WordGame from './components/WordGame/WordGame'
 import { AdminPage } from './components/Admin/AdminPage'
@@ -12,17 +13,20 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import RestartAltIcon from '@mui/icons-material/RestartAlt'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import LightbulbIcon from '@mui/icons-material/Lightbulb'
+import { useTranslation } from 'react-i18next'
+import LanguageIcon from '@mui/icons-material/Language'
 
 function App() {
+  const { t, i18n } = useTranslation();
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode')
+    return saved ? JSON.parse(saved) : false
+  })
   const [currentLevel, setCurrentLevel] = useState(1)
   const [score, setScore] = useState(0)
   const [guessedWords, setGuessedWords] = useState<string[]>([])
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false)
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode')
-    return saved ? JSON.parse(saved) : false
-  })
 
   useEffect(() => {
     const savedState = localStorage.getItem('gameState')
@@ -87,6 +91,11 @@ function App() {
     }
   }
 
+  const handleLanguageChange = (lang: string) => {
+    i18n.changeLanguage(lang);
+    handleMenuClose();
+  };
+
   const currentLevelData = LEVELS.find(l => l.index === currentLevel) || LEVELS[0]
 
   return (
@@ -117,7 +126,7 @@ function App() {
               <ListItemIcon>
                 <RestartAltIcon fontSize="small" color="error" />
               </ListItemIcon>
-              <ListItemText>Reset Game</ListItemText>
+              <ListItemText>{t('resetGame')}</ListItemText>
             </MenuItem>
             <MenuItem 
               component={Link}
@@ -128,7 +137,26 @@ function App() {
               <ListItemIcon>
                 <AdminPanelSettingsIcon fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Admin</ListItemText>
+              <ListItemText>{t('admin')}</ListItemText>
+            </MenuItem>
+            <Divider />
+            <MenuItem
+              onClick={() => handleLanguageChange('en')}
+              sx={{ minWidth: 150 }}
+            >
+              <ListItemIcon>
+                <LanguageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('english')}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => handleLanguageChange('ru')}
+              sx={{ minWidth: 150 }}
+            >
+              <ListItemIcon>
+                <LanguageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('russian')}</ListItemText>
             </MenuItem>
           </Menu>
 
@@ -164,10 +192,10 @@ function App() {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>Reset Game?</DialogTitle>
+        <DialogTitle>{t('resetGame')}</DialogTitle>
         <DialogContent>
           <Typography>
-            This will reset your progress to Level 1 and clear your score. Are you sure?
+            {t('resetGameConfirm')}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -175,7 +203,7 @@ function App() {
             onClick={() => setIsResetDialogOpen(false)}
             size="small"
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button 
             onClick={handleResetGame}
@@ -184,7 +212,7 @@ function App() {
             size="small"
             autoFocus
           >
-            Reset Game
+            {t('resetGame')}
           </Button>
         </DialogActions>
       </Dialog>

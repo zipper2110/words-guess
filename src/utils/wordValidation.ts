@@ -1,4 +1,5 @@
 import { fetchWordDefinition } from "../components/WordGame/dictionaryService"
+import { countLetters } from './wordUtils'
 
 export interface ValidationResult {
   valid: string[]
@@ -86,15 +87,8 @@ export function isValidWord(word: string, baseWord: string): boolean {
     return false;
   }
   
-  const baseLetters = baseWord.toLowerCase().split('').reduce((acc, letter) => {
-    acc[letter] = (acc[letter] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-
-  const wordLetters = word.toLowerCase().split('').reduce((acc, letter) => {
-    acc[letter] = (acc[letter] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const baseLetters = countLetters(baseWord)
+  const wordLetters = countLetters(word)
 
   return Object.entries(wordLetters).every(([letter, count]) => 
     (baseLetters[letter] || 0) >= count

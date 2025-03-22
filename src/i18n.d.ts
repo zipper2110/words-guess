@@ -40,6 +40,10 @@ declare module 'i18next' {
         levelValidation: string;
         english: string;
         russian: string;
+        resetGame: string;
+        admin: string;
+        language: string;
+        resetGameConfirm: string;
       }
     }
   }

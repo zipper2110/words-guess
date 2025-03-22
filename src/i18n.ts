@@ -1,8 +1,9 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { Resource } from 'i18next';
 
-const resources = {
+const resources: Resource = {
   en: {
     translation: {
       "welcome": "Welcome",
@@ -135,14 +136,16 @@ i18n
   .init({
     resources,
     fallbackLng: 'en',
+    supportedLngs: ['en', 'ru'],
     interpolation: {
-      escapeValue: false, // React already safes from XSS
+      escapeValue: false,
     },
     detection: {
-      order: ['localStorage', 'navigator', 'htmlTag', 'cookie', 'path'],
-      caches: ['localStorage', 'cookie'],
-      lookupLocalStorage: 'i18nextLng',
-      lookupCookie: 'i18nextLng',
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
+    },
+    react: {
+      useSuspense: false
     }
   });
 

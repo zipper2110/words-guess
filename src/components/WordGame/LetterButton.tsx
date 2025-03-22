@@ -5,10 +5,16 @@ const LetterButton: React.FC<LetterButtonProps> = ({ letter, onClick, disabled =
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   
+  const handleClick = () => {
+    if (!disabled) {
+      onClick();
+    }
+  };
+  
   return (
     <Button
       variant="contained"
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
       sx={{
         width: { xs: 38, sm: 45 },
