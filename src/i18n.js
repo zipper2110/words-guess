@@ -37,8 +37,32 @@ const resources = {
       "showDefinitions": "Show Definitions",
       "typeGuess": "Type your guess...",
       "levelCompletePlaceholder": "Level Complete!",
-      "submit": "Submit"
-      // Add more translations as needed
+      "submit": "Submit",
+      "duplicateWords": "Duplicate Words:",
+      "notRealWords": "Not Real Words:",
+      "english": "🇺🇸 English",
+      "russian": "🇷🇺 Русский",
+      "levelValidation": "Level Validation",
+      "baseWord": "Base Word:",
+      "totalWords": "Total Words:",
+      "validWords": "Valid Words:",
+      "invalidWords": "Invalid Words:",
+      "wordStatusValid": "Valid",
+      "wordStatusInvalid": "Invalid",
+      "wordStatusDuplicate": "Duplicate",
+      "wordStatusNotReal": "Not a real word",
+      "adminAccess": "Admin Access",
+      "password": "Password",
+      "invalidPassword": "Invalid password",
+      "backToGame": "Back to Game",
+      "levelAdministration": "Level Administration",
+      "validateLevels": "Validate Levels",
+      "addLevel": "Add Level",
+      "editLevel": "Edit Level",
+      "addNewLevel": "Add New Level",
+      "subWordsHint": "Enter words separated by commas",
+      "save": "Save",
+      "actions": "Actions"
     }
   },
   ru: {
@@ -75,8 +99,32 @@ const resources = {
       "showDefinitions": "Показать определения",
       "typeGuess": "Введите ваше слово...",
       "levelCompletePlaceholder": "Уровень пройден!",
-      "submit": "Отправить"
-      // Add more translations as needed
+      "submit": "Отправить",
+      "duplicateWords": "Дубликаты слов:",
+      "notRealWords": "Несуществующие слова:",
+      "english": "🇺🇸 English",
+      "russian": "🇷🇺 Русский",
+      "levelValidation": "Проверка уровня",
+      "baseWord": "Основное слово:",
+      "totalWords": "Всего слов:",
+      "validWords": "Правильных слов:",
+      "invalidWords": "Неправильных слов:",
+      "wordStatusValid": "Правильное",
+      "wordStatusInvalid": "Неправильное",
+      "wordStatusDuplicate": "Дубликат",
+      "wordStatusNotReal": "Несуществующее слово",
+      "adminAccess": "Доступ администратора",
+      "password": "Пароль",
+      "invalidPassword": "Неверный пароль",
+      "backToGame": "Вернуться к игре",
+      "levelAdministration": "Управление уровнями",
+      "validateLevels": "Проверить уровни",
+      "addLevel": "Добавить уровень",
+      "editLevel": "Редактировать уровень",
+      "addNewLevel": "Добавить новый уровень",
+      "subWordsHint": "Введите слова через запятую",
+      "save": "Сохранить",
+      "actions": "Действия"
     }
   }
 };
@@ -91,9 +139,16 @@ i18n
       escapeValue: false, // React already safes from XSS
     },
     detection: {
-      order: ['navigator', 'htmlTag', 'cookie', 'localStorage', 'path'],
+      order: ['localStorage', 'navigator', 'htmlTag', 'cookie', 'path'],
       caches: ['localStorage', 'cookie'],
+      lookupLocalStorage: 'i18nextLng',
+      lookupCookie: 'i18nextLng',
     }
   });
+
+// Save language preference when it changes
+i18n.on('languageChanged', (lng) => {
+  localStorage.setItem('i18nextLng', lng);
+});
 
 export default i18n; 
