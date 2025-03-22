@@ -8,6 +8,9 @@ export interface ValidationResult {
   baseWordValid: boolean
   baseWordTooShort: boolean
   baseWordNotReal: boolean
+  has5LetterWord: boolean
+  has3LetterWord: boolean
+  has4LetterWord: boolean
 }
 
 export async function validateLevelWords(baseWord: string, subWords: string[]): Promise<ValidationResult> {
@@ -52,6 +55,12 @@ export async function validateLevelWords(baseWord: string, subWords: string[]): 
     }
   }
 
+  // Check for required word lengths
+  const validWords = valid.filter(word => !notRealWords.includes(word))
+  const has5LetterWord = validWords.some(word => word.length === 5)
+  const has3LetterWord = validWords.some(word => word.length === 3)
+  const has4LetterWord = validWords.some(word => word.length === 4)
+
   return {
     valid,
     invalid,
@@ -59,11 +68,19 @@ export async function validateLevelWords(baseWord: string, subWords: string[]): 
     notRealWords,
     baseWordValid,
     baseWordTooShort,
-    baseWordNotReal
+    baseWordNotReal,
+    has5LetterWord,
+    has3LetterWord,
+    has4LetterWord
   }
 }
 
 export function isValidWord(word: string, baseWord: string): boolean {
+  // Don't allow the exact base word
+  if (word.toLowerCase() === baseWord.toLowerCase()) {
+    return false;
+  }
+  
   const baseLetters = baseWord.toLowerCase().split('').reduce((acc, letter) => {
     acc[letter] = (acc[letter] || 0) + 1
     return acc

@@ -28,7 +28,7 @@ export const LEVELS4: Level[] = [
   {
     index: 36,
     baseWord: 'DIAMOND',
-    subWords: ['MAID', 'MAIN', 'MIND', 'MOAN', 'DIAMOND']
+    subWords: ['MAID', 'MAIN', 'MIND', 'MOAN', 'AMID']
   },
   {
     index: 37,
@@ -38,7 +38,7 @@ export const LEVELS4: Level[] = [
   {
     index: 38,
     baseWord: 'CRYSTAL',
-    subWords: ['CRY', 'CAST', 'RACY', 'STAR', 'TRAY']
+    subWords: ['CRY', 'CAST', 'RACY', 'STAR', 'TRAY', 'STRAY']
   },
   {
     index: 39,

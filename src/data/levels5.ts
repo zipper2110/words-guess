@@ -42,8 +42,8 @@ export const LEVELS5: Level[] = [
   },
   {
     index: 49,
-    baseWord: 'QUEST',
-    subWords: ['QUEST', 'SET', 'USE', 'SUE', 'EST']
+    baseWord: 'QUESTS',
+    subWords: ['QUEST', 'QUITS', 'QUIET', 'STUE', 'SIT']
   },
   {
     index: 50,

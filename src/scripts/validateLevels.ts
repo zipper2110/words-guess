@@ -9,7 +9,7 @@ async function validateLevel(level: number) {
   }
 
   console.log(`\nValidating level ${targetLevel.index} ("${targetLevel.baseWord}"):`)
-  const { valid, invalid, duplicates, notRealWords, baseWordValid, baseWordTooShort, baseWordNotReal } = await validateLevelWords(targetLevel.baseWord, targetLevel.subWords)
+  const { valid, invalid, duplicates, notRealWords, baseWordValid, baseWordTooShort, baseWordNotReal, has5LetterWord, has3LetterWord, has4LetterWord } = await validateLevelWords(targetLevel.baseWord, targetLevel.subWords)
 
   if (!baseWordValid) {
     console.log(`\nLevel ${targetLevel.index} ("${targetLevel.baseWord}"):`)
@@ -37,6 +37,18 @@ async function validateLevel(level: number) {
     notRealWords.forEach(word => {
       console.log(`  ${word} - Not a real English word`)
     })
+  }
+  if (!has5LetterWord || !has3LetterWord || !has4LetterWord) {
+    console.log(`\nLevel ${targetLevel.index} ("${targetLevel.baseWord}"):`)
+    if (!has5LetterWord) {
+      console.log(`  Missing required 5-letter word`)
+    }
+    if (!has3LetterWord) {
+      console.log(`  Missing required 3-letter word`)
+    }
+    if (!has4LetterWord) {
+      console.log(`  Missing required 4-letter word`)
+    }
   }
 }
 
