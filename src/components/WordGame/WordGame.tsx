@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Box, Button, TextField, Grid, Typography, Snackbar, Alert, Paper } from '@mui/material'
+import { Box, Button, TextField, Grid, Typography, Snackbar, Alert, Paper, IconButton } from '@mui/material'
+import HelpIcon from '@mui/icons-material/Help'
 import { LEVELS } from '../../data/levels'
 import { WordGameProps, GameState, FeedbackState, WordDefinition } from './types'
 import { LetterButton } from './LetterButton'
 import { GameBoard } from './GameBoard'
 import { DefinitionsModal } from './DefinitionsModal'
+import { HelpModal } from './HelpModal'
 import { fetchWordDefinition } from './dictionaryService'
 import { isValidWord } from '../../utils/wordValidation'
 
@@ -29,6 +31,7 @@ const WordGame: React.FC<WordGameProps> = ({
   })
 
   const [isLevelComplete, setIsLevelComplete] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
 
   useEffect(() => {
     console.log('Level changed:', level)
@@ -190,10 +193,18 @@ const WordGame: React.FC<WordGameProps> = ({
   return (
     <Box>
       <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12}>
-          <Typography variant="h5" align="center" gutterBottom>
+        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h5" align="center">
             Score: {score}
           </Typography>
+          <IconButton
+            onClick={() => setShowHelp(true)}
+            color="primary"
+            size="large"
+            aria-label="help"
+          >
+            <HelpIcon />
+          </IconButton>
         </Grid>
 
         {isLevelComplete && (
@@ -318,6 +329,11 @@ const WordGame: React.FC<WordGameProps> = ({
           {gameState.feedback.message}
         </Alert>
       </Snackbar>
+
+      <HelpModal
+        open={showHelp}
+        onClose={() => setShowHelp(false)}
+      />
     </Box>
   )
 }
