@@ -26,7 +26,8 @@ export const HelpModal: React.FC<HelpModalProps> = ({ open, onClose }) => {
     'You can use each letter only once per word',
     'All words must be valid English words',
     'Score points based on the length of each word you find',
-    'Find all possible words to complete the level'
+    'Find all possible words to complete the level',
+    'Need help? Use the menu to get a clue for an unfound word'
   ]
 
   return (

@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import { Container, Typography, Box, Button, ThemeProvider, CssBaseline } from '@mui/material'
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Container, Typography, Box, Button, ThemeProvider, CssBaseline, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material'
 import { lightTheme, darkTheme } from './theme'
 import WordGame from './components/WordGame/WordGame'
 import { AdminPage } from './components/Admin/AdminPage'
 import { LEVELS } from './data/levels'
 import { Level } from './types'
+import Brightness4Icon from '@mui/icons-material/Brightness4'
+import Brightness7Icon from '@mui/icons-material/Brightness7'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
+import LightbulbIcon from '@mui/icons-material/Lightbulb'
 
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1)
   const [score, setScore] = useState(0)
   const [guessedWords, setGuessedWords] = useState<string[]>([])
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false)
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode')
     return saved ? JSON.parse(saved) : false
@@ -53,6 +61,30 @@ function App() {
     setCurrentLevel(1)
     setScore(0)
     setGuessedWords([])
+    setIsResetDialogOpen(false)
+  }
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null)
+  }
+
+  const handleResetClick = () => {
+    handleMenuClose()
+    setIsResetDialogOpen(true)
+  }
+
+  const handleClue = () => {
+    handleMenuClose()
+    const currentLevelData = LEVELS.find(l => l.index === currentLevel) || LEVELS[0]
+    const unguessedWords = currentLevelData.subWords.filter(word => !guessedWords.includes(word))
+    if (unguessedWords.length > 0) {
+      const clueWord = unguessedWords[0]
+      setGuessedWords(prev => [...prev, clueWord])
+    }
   }
 
   const currentLevelData = LEVELS.find(l => l.index === currentLevel) || LEVELS[0]
@@ -62,36 +94,52 @@ function App() {
       <CssBaseline />
       <Router>
         <Container maxWidth="md">
-          <Box sx={{ my: 4, textAlign: 'center' }}>
-            <Typography variant="h6" component="h1" gutterBottom>
-              Level {currentLevel} of {LEVELS.length}
-            </Typography>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={handleResetGame}
-                sx={{ minWidth: '100px' }}
-              >
-                Reset Game
-              </Button>
-              <Button
-                variant="outlined"
-                component={Link}
-                to="/admin"
-                sx={{ minWidth: '100px' }}
-              >
-                Admin
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                sx={{ minWidth: '100px' }}
-              >
-                {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-              </Button>
+          <Box sx={{ my: 2, textAlign: 'center' }}>
+            <Box sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              gap: 1,
+              flexWrap: 'wrap',
+              alignItems: 'center'
+            }}>
             </Box>
           </Box>
+
+          <Menu
+            anchorEl={menuAnchorEl}
+            open={Boolean(menuAnchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem 
+              onClick={handleResetClick}
+              sx={{ minWidth: 150 }}
+            >
+              <ListItemIcon>
+                <RestartAltIcon fontSize="small" color="error" />
+              </ListItemIcon>
+              <ListItemText>Reset Game</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              component={Link}
+              to="/admin"
+              onClick={handleMenuClose}
+              sx={{ minWidth: 150 }}
+            >
+              <ListItemIcon>
+                <AdminPanelSettingsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Admin</ListItemText>
+            </MenuItem>
+            <MenuItem 
+              onClick={handleClue}
+              sx={{ minWidth: 150 }}
+            >
+              <ListItemIcon>
+                <LightbulbIcon fontSize="small" sx={{ color: '#DAA520' }} />
+              </ListItemIcon>
+              <ListItemText>Get Clue</ListItemText>
+            </MenuItem>
+          </Menu>
 
           <Routes>
             <Route 
@@ -106,6 +154,10 @@ function App() {
                     guessedWords={guessedWords}
                     onGuessedWordsUpdate={setGuessedWords}
                     subWords={currentLevelData.subWords}
+                    onMenuOpen={handleMenuOpen}
+                    onThemeToggle={() => setIsDarkMode(!isDarkMode)}
+                    isDarkMode={isDarkMode}
+                    onClue={handleClue}
                   />
                 </>
               } 
@@ -114,6 +166,38 @@ function App() {
           </Routes>
         </Container>
       </Router>
+
+      <Dialog
+        open={isResetDialogOpen}
+        onClose={() => setIsResetDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Reset Game?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            This will reset your progress to Level 1 and clear your score. Are you sure?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setIsResetDialogOpen(false)}
+            size="small"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleResetGame}
+            color="error"
+            variant="contained"
+            size="small"
+            autoFocus
+          >
+            Reset Game
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </ThemeProvider>
   )
 }

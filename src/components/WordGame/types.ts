@@ -14,6 +14,10 @@ export interface WordGameProps {
   setGuessedWords?: (words: string[]) => void;
   subWords?: string[];
   onResetGame?: () => void;
+  onMenuOpen?: (event: React.MouseEvent<HTMLElement>) => void;
+  onThemeToggle?: () => void;
+  isDarkMode?: boolean;
+  onClue?: () => void;
 }
 
 export interface WordDefinition {
