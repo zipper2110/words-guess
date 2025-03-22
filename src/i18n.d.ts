@@ -48,4 +48,6 @@ declare module 'i18next' {
 declare module './i18n' {
   import i18next from 'i18next';
   export default i18next;
-} 
+}
+
+export {}; 

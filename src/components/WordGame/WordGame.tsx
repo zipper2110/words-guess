@@ -81,6 +81,7 @@ const WordGame: React.FC<WordGameProps> = (props) => {
           guessedWords={guessedWords}
           onShowDefinitions={handleShowDefinitions}
           isLevelComplete={isLevelComplete}
+          revealedLetters={gameState.revealedLetters}
         />
         
         {/* Divider */}
